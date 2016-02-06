@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+        http://www.springframework.org/schema/context
+    	http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	">
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:dbconfig.properties</value>
+        </property>
+    </bean>
+    <context:component-scan base-package="com.yks.crm.service"/>
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="crm_user_provider"/>
+    <!-- 使用multicast广播注册中心暴露服务地址
+     -->
+    <dubbo:registry address="multicast://224.1.1.1:1234"/>
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
+    <!--<dubbo:registry address="zookeeper://192.168.3.15:2181"/>-->
+    <!-- 用dubbo协议在20880端口暴露服务 -->
+    <dubbo:protocol name="dubbo" port="20880"/>
+    <!-- 声明需要暴露的服务接口 -->
+    <dubbo:service interface="com.yks.crm.service.user.UserServiceApi"
+                   ref="orderService"/>
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="url">
+            <value>${jdbc_url}</value>
+        </property>
+        <property name="username">
+            <value>${jdbc_username}</value>
+        </property>
+        <property name="password">
+            <value>${jdbc_password}</value>
+        </property>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="mapperLocations" value="classpath:com/yks/mapping/*.xml"></property>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <tx:advice id="tx" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="del*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="select*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="pc" expression="execution(* com.yks.service.*.*(..))"/>
+        <aop:advisor advice-ref="tx" pointcut-ref="pc"/>
+    </aop:config>
+</beans>

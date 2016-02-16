@@ -7,7 +7,7 @@ import com.yks.crm.pojo.user.UserInfo;
  */
 public interface UserServiceApi {
     UserInfo findUserInfoByLoginName(String loginName);
-    void saveUserInfo(UserInfo userInfo);
-    void delUserInfoById(Long id);
-    void updateUserInfo(UserInfo userInfo);
+    int saveUserInfo(UserInfo userInfo);
+    int delUserInfoById(Long id);
+    int updateUserInfo(UserInfo userInfo);
 }

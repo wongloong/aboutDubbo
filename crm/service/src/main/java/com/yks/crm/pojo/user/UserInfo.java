@@ -1,20 +1,15 @@
 package com.yks.crm.pojo.user;
 
-import java.io.Serializable;
 import java.util.Date;
 
-/**
- * Created by wanglong on 16-2-6.
- */
-public class UserInfo implements Serializable {
+public class UserInfo {
     private Long id;
-    private String loginName;
+
+    private String loginname;
+
     private String password;
-    private Date createTime;
-    /**
-     * 是否启用 0 禁用 1启用
-     */
-    private int enable;
+
+    private Date createtime;
 
     public Long getId() {
         return id;
@@ -24,12 +19,12 @@ public class UserInfo implements Serializable {
         this.id = id;
     }
 
-    public String getLoginName() {
-        return loginName;
+    public String getLoginname() {
+        return loginname;
     }
 
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
+    public void setLoginname(String loginname) {
+        this.loginname = loginname == null ? null : loginname.trim();
     }
 
     public String getPassword() {
@@ -37,22 +32,14 @@ public class UserInfo implements Serializable {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password == null ? null : password.trim();
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getCreatetime() {
+        return createtime;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public int getEnable() {
-        return enable;
-    }
-
-    public void setEnable(int enable) {
-        this.enable = enable;
+    public void setCreatetime(Date createtime) {
+        this.createtime = createtime;
     }
 }

@@ -2,8 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://code.alibabatech.com/schema/dubbo
@@ -15,11 +15,7 @@
         http://www.springframework.org/schema/context
     	http://www.springframework.org/schema/context/spring-context-3.2.xsd
 	">
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location">
-            <value>classpath:dbconfig.properties</value>
-        </property>
-    </bean>
+    <context:property-placeholder location="classpath:dbconfig.properties"/>
     <context:component-scan base-package="com.yks.crm.service"/>
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="crm_user_provider"/>
@@ -32,7 +28,7 @@
     <dubbo:protocol name="dubbo" port="20880"/>
     <!-- 声明需要暴露的服务接口 -->
     <dubbo:service interface="com.yks.crm.service.user.UserServiceApi"
-                   ref="orderService"/>
+                   ref="userService"/>
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
         <property name="url">
             <value>${jdbc_url}</value>
@@ -46,10 +42,15 @@
     </bean>
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
-        <property name="mapperLocations" value="classpath:com/yks/mapping/*.xml"></property>
+        <property name="mapperLocations" value="classpath:com/yks/crm/mapping/user/*.xml"></property>
     </bean>
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--<property name="annotationClass" value="org.springframework.stereotype.Repository"/>-->
+        <property name="basePackage" value="com.yks.crm.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
     <tx:advice id="tx" transaction-manager="transactionManager">
         <tx:attributes>
@@ -64,7 +65,7 @@
         </tx:attributes>
     </tx:advice>
     <aop:config>
-        <aop:pointcut id="pc" expression="execution(* com.yks.service.*.*(..))"/>
+        <aop:pointcut id="pc" expression="execution(* com.yks.service..*Impl.*(..))"/>
         <aop:advisor advice-ref="tx" pointcut-ref="pc"/>
     </aop:config>
 </beans>

@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class Role implements Serializable{
     private Long id;
     private String roleName;
-    private Long userRoleId;
 
     public Long getId() {
         return id;
